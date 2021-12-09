@@ -10,48 +10,67 @@ namespace Drops
     public class DropFactory
     {
         public static UnityAction<int> DropsAreClosedAction;
-
         private readonly SpriteAtlas _dropsSpriteAtlas;
         private static List<Drop> dropList;
-        private static List<Drop> dropToCloseList;
-
+        private static List<Drop> closestDrops;
+        
         public DropFactory(SpriteAtlas dropsSpriteAtlas)
         {
             dropList = new List<Drop>();
-            dropToCloseList = new List<Drop>();
+            closestDrops = new List<Drop>();
             _dropsSpriteAtlas = dropsSpriteAtlas;
         }
 
         public Drop GetADrop(IDropColor dropColor)
         {
-            var drop = dropList.Find(d => d.DropColor.GetType() ==  dropColor.GetType() && !d.IsInUse);
-            if (drop != null) return drop;
+            var drop = dropList.Find(d => d.DropColor ==  dropColor && !d.IsInUse);
+            if (drop != null)
+            {
+                return drop;
+            }
             var sprite = _dropsSpriteAtlas.GetSprite(dropColor.GetType().Name); 
             drop = new Drop(sprite, dropColor);
             dropList.Add(drop);
-            return drop;
+            return drop;    
+            
         }
 
-        
-        public static void Called(IDropColor dropColor, Transform dropPosition )
+        public void Restart()
         {
             foreach (var drop in dropList)
             {
-                if (drop.DropColor == dropColor)
+                drop.CloseThisDrop();
+            }
+        }
+        
+        
+        public static void DropSelected(Drop selectedDrop)
+        {
+            closestDrops.Add(selectedDrop);
+            for (var i = 0; i < dropList.Count; i++)
+            {
+                if (dropList[i].DropColor == selectedDrop.DropColor)
                 {
-                    dropToCloseList.Add(drop);
+                    for (var j = 0; j < closestDrops.Count; j++)
+                    {
+                        var distance = Vector2.Distance(dropList[i].Transform.position, closestDrops[j].Transform.position);
+                        if (distance < 0.6 && !closestDrops.Contains(dropList[i]))
+                        {
+                            closestDrops.Add(dropList[i]);
+                            i = 0;
+                        }
+                    }
                 }
             }
-
-            if (dropToCloseList.Count > 0)
+            if (closestDrops.Count > 1)
             {
-                foreach (var drop in dropToCloseList)
+                foreach (var drop in closestDrops)
                 {
                     drop.CloseThisDrop();
                 }
-                DropsAreClosedAction?.Invoke(dropToCloseList.Count);
-                dropToCloseList.Clear();
+                DropsAreClosedAction?.Invoke(closestDrops.Count);
             }
+            closestDrops.Clear();
         }
         
     }

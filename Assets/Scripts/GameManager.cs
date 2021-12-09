@@ -22,6 +22,13 @@ public class GameManager : MonoBehaviour
     }
 
 
+    public void Restart()
+    {
+        _dropFactory.Restart();
+        _spawner.Restart();
+    }
+    
+    
     private void OnDestroy()
     {
         _spawner.GameIsKilled();

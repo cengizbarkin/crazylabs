@@ -1,31 +1,27 @@
 using Colors;
 using Lean.Touch;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Drops
 {
     public class Drop
     {
+        public IDropColor DropColor { get; }
+        public Transform Transform { get; private set; }
+        public bool IsInUse { get; private set; }
+        
         private GameObject _dropGameObject;
         private SpriteRenderer _spriteRenderer;
         private Rigidbody2D _rigidbody2D;
         private CircleCollider2D _circleCollider2D;
         private readonly Sprite _sprite;
-        public IDropColor DropColor { get; private set; }
-
-        public Transform Transform { get; set; }
-        
-        public bool IsInUse { get; set; }
-    
-        //private Vector2 dropPos;
         private bool _componentsAreAdded;
+        
         
         public Drop(Sprite sprite, IDropColor dropColor)
         {
             _sprite = sprite;
             DropColor = dropColor;
-            
             LeanTouch.OnFingerTap += HandleFingerTap;
         }
 
@@ -75,16 +71,13 @@ namespace Drops
         {
             if (AmISelectedTile(finger))
             {
-                DropFactory.Called(DropColor, _dropGameObject.transform);
-                //CloseThisDrop();
+                DropFactory.DropSelected(this);
             }
         }
         
-    
         private bool AmISelectedTile(LeanFinger finger)
         {
             if (!Camera.main) return false;
-            //dropPos = _dropGameObject.transform.position;
             var fingerWordPosition = Camera.main.ScreenToWorldPoint(finger.ScreenPosition);
             return _circleCollider2D.OverlapPoint(fingerWordPosition);
         }

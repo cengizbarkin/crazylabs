@@ -5,10 +5,9 @@ using UnityEngine;
 
 public class Spawner
 {
-    private List<IDropColor> _colorList;
-    private GameObject _spawnerGameObject;
-    private DropFactory _dropFactory;
-    
+    private readonly List<IDropColor> _colorList;
+    private readonly GameObject _spawnerGameObject;
+    private readonly DropFactory _dropFactory;
     
     public Spawner(GameObject spawnerGameObject, DropFactory dropFactory)
     {
@@ -31,6 +30,10 @@ public class Spawner
         SpawnDrops(closedDropCount);
     }
 
+    public void Restart()
+    {
+        SpawnDrops(100);
+    }
 
     private void SpawnDrops(int count)
     {
