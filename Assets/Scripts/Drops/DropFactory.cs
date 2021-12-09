@@ -1,42 +1,58 @@
-using System;
 using System.Collections.Generic;
+using Colors;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.U2D;
+
 
 namespace Drops
 {
     public class DropFactory
     {
-        private readonly SpriteAtlas _dropsSpriteAtlas = Resources.Load<SpriteAtlas>("SpriteAtlases/Drops");
-        private readonly List<Drop> _dropList;
+        public static UnityAction<int> DropsAreClosedAction;
 
-        public DropFactory()
+        private readonly SpriteAtlas _dropsSpriteAtlas;
+        private static List<Drop> dropList;
+        private static List<Drop> dropToCloseList;
+
+        public DropFactory(SpriteAtlas dropsSpriteAtlas)
         {
-            _dropList = new List<Drop>();
+            dropList = new List<Drop>();
+            dropToCloseList = new List<Drop>();
+            _dropsSpriteAtlas = dropsSpriteAtlas;
         }
 
-        public Drop GetADrop(Type dropType)
+        public Drop GetADrop(IDropColor dropColor)
         {
-            var drop = _dropList.Find(d => d.GetType() == dropType && !d.IsInUse);
+            var drop = dropList.Find(d => d.DropColor.GetType() ==  dropColor.GetType() && !d.IsInUse);
             if (drop != null) return drop;
-            if (dropType == typeof(GrayDrop))
-            {
-                drop = new GrayDrop(_dropsSpriteAtlas);
-            } 
-            else if (dropType == typeof(GreenDrop))
-            {
-                drop = new GreenDrop(_dropsSpriteAtlas);
-            }
-            else if (dropType == typeof(PinkDrop))
-            {
-                drop = new PinkDrop(_dropsSpriteAtlas);
-            }
-            else if (dropType == typeof(YellowDrop))
-            {
-                drop = new YellowDrop(_dropsSpriteAtlas);
-            }
-            _dropList.Add(drop);
+            var sprite = _dropsSpriteAtlas.GetSprite(dropColor.GetType().Name); 
+            drop = new Drop(sprite, dropColor);
+            dropList.Add(drop);
             return drop;
         }
+
+        
+        public static void Called(IDropColor dropColor, Transform dropPosition )
+        {
+            foreach (var drop in dropList)
+            {
+                if (drop.DropColor == dropColor)
+                {
+                    dropToCloseList.Add(drop);
+                }
+            }
+
+            if (dropToCloseList.Count > 0)
+            {
+                foreach (var drop in dropToCloseList)
+                {
+                    drop.CloseThisDrop();
+                }
+                DropsAreClosedAction?.Invoke(dropToCloseList.Count);
+                dropToCloseList.Clear();
+            }
+        }
+        
     }
 }

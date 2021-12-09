@@ -1,26 +1,31 @@
+using Colors;
 using Lean.Touch;
 using UnityEngine;
-using UnityEngine.U2D;
+using UnityEngine.UIElements;
 
 namespace Drops
 {
-    public abstract class Drop
+    public class Drop
     {
         private GameObject _dropGameObject;
         private SpriteRenderer _spriteRenderer;
-        protected Rigidbody2D Rigidbody2D;
-        protected CircleCollider2D CircleCollider2D;
-        private SpriteAtlas _spriteAtlas;
+        private Rigidbody2D _rigidbody2D;
+        private CircleCollider2D _circleCollider2D;
+        private readonly Sprite _sprite;
+        public IDropColor DropColor { get; private set; }
+
+        public Transform Transform { get; set; }
         
-        protected Transform Transform { get; set; }
         public bool IsInUse { get; set; }
     
         //private Vector2 dropPos;
         private bool _componentsAreAdded;
         
-        protected Drop(SpriteAtlas spriteAtlas)
+        public Drop(Sprite sprite, IDropColor dropColor)
         {
-            _spriteAtlas = spriteAtlas;
+            _sprite = sprite;
+            DropColor = dropColor;
+            
             LeanTouch.OnFingerTap += HandleFingerTap;
         }
 
@@ -38,34 +43,40 @@ namespace Drops
             _dropGameObject.transform.position = position;
         }
 
-        private void CloseThisDrop()
+        public void CloseThisDrop()
         {
             IsInUse = false;
             _dropGameObject.SetActive(false);
         }
-        
-        public abstract void AddForceToThisDrop();
+
+        public void AddForceToThisDrop()
+        {
+            var x = Random.Range(-0.5f, 0.5f);
+            var y = Random.Range(-0.5f, -0.1f);
+            var force = new Vector2(x, y);
+            _rigidbody2D.velocity = force;
+        }
         
 
         private void AddComponentsOfDrop()
         {
-            _dropGameObject = new GameObject(GetType().Name);
+            _dropGameObject = new GameObject(DropColor.GetType().Name);
+            Transform = _dropGameObject.transform;
             _spriteRenderer = _dropGameObject.AddComponent<SpriteRenderer>();
-            Rigidbody2D = _dropGameObject.AddComponent<Rigidbody2D>();
-            Rigidbody2D.mass = 0.1f;
-            CircleCollider2D = _dropGameObject.AddComponent<CircleCollider2D>();
-            Transform = _dropGameObject.GetComponent<Transform>();
-            _spriteRenderer.sprite = _spriteAtlas.GetSprite(GetType().Name);
-            
+            _rigidbody2D = _dropGameObject.AddComponent<Rigidbody2D>();
+            _rigidbody2D.mass = 0.1f;
+            _circleCollider2D = _dropGameObject.AddComponent<CircleCollider2D>();
+            _spriteRenderer.sprite = _sprite;
             var spriteHalfSize = _spriteRenderer.sprite.bounds.extents;
-            CircleCollider2D.radius = spriteHalfSize.x > spriteHalfSize.y ? spriteHalfSize.x : spriteHalfSize.y;
+            _circleCollider2D.radius = spriteHalfSize.x > spriteHalfSize.y ? spriteHalfSize.x : spriteHalfSize.y;
         }
         
         private void HandleFingerTap(LeanFinger finger)
         {
             if (AmISelectedTile(finger))
             {
-                CloseThisDrop();
+                DropFactory.Called(DropColor, _dropGameObject.transform);
+                //CloseThisDrop();
             }
         }
         
@@ -75,7 +86,7 @@ namespace Drops
             if (!Camera.main) return false;
             //dropPos = _dropGameObject.transform.position;
             var fingerWordPosition = Camera.main.ScreenToWorldPoint(finger.ScreenPosition);
-            return CircleCollider2D.OverlapPoint(fingerWordPosition);
+            return _circleCollider2D.OverlapPoint(fingerWordPosition);
         }
     }
 }

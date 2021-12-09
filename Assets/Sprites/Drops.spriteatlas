@@ -57,10 +57,10 @@ SpriteAtlas:
   - {fileID: 21300000, guid: a5ad641b763994fa2a01ce0bbbe5a2fd, type: 3}
   - {fileID: 21300000, guid: c3467aee55bbc48eebeb06f86230c40b, type: 3}
   m_PackedSpriteNamesToIndex:
-  - GreenDrop
-  - GrayDrop
-  - PinkDrop
-  - YellowDrop
+  - Green
+  - Gray
+  - Pink
+  - Yellow
   m_RenderDataMap: {}
   m_Tag: Drops
   m_IsVariant: 0

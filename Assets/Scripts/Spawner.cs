@@ -1,49 +1,51 @@
+using System.Collections.Generic;
+using Colors;
 using Drops;
 using UnityEngine;
 
-public class Spawner : MonoBehaviour
+public class Spawner
 {
-    [SerializeField]
-    private GameObject drop;
-
-    private int _totalDropCount = 100;
-    private int _instantiatedDropDropCount;
-    private float lastY;
-    private int _frameCount;
-
+    private List<IDropColor> _colorList;
+    private GameObject _spawnerGameObject;
     private DropFactory _dropFactory;
     
     
-    private void Start()
+    public Spawner(GameObject spawnerGameObject, DropFactory dropFactory)
     {
-        _dropFactory = new DropFactory();
-        for (var i = 0; i < _totalDropCount; i++)
+        _spawnerGameObject = spawnerGameObject;
+        _dropFactory = dropFactory;
+        
+        _colorList = new List<IDropColor>
         {
-            var position = transform.position;
-            var aDrop = (i % 4) switch
-            {
-                0 => _dropFactory.GetADrop(typeof(GrayDrop)),
-                1 => _dropFactory.GetADrop(typeof(GreenDrop)),
-                2 => _dropFactory.GetADrop(typeof(PinkDrop)),
-                3 => _dropFactory.GetADrop(typeof(YellowDrop)),
-                _ => null
-            };
+            new Gray(),
+            new Green(),
+            new Pink(),
+            new Yellow()
+        };
+        SpawnDrops(100);
+        DropFactory.DropsAreClosedAction += DropsAreClosedAction;
+    }
+
+    private void DropsAreClosedAction(int closedDropCount)
+    {
+        SpawnDrops(closedDropCount);
+    }
+
+
+    private void SpawnDrops(int count)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            var position = _spawnerGameObject.transform.position;
+            var aDrop = _dropFactory.GetADrop(_colorList[i % 4]);
             var randomPos = new Vector3(position.x, position.y + i / 2.0f);
-            aDrop?.OpenThisDrop(randomPos, transform);
-            aDrop?.AddForceToThisDrop();
+            aDrop.OpenThisDrop(randomPos,_spawnerGameObject.transform);
+            aDrop.AddForceToThisDrop();
         }
     }
 
-    private void Update()
+    public void GameIsKilled()
     {
-        if (_instantiatedDropDropCount < _totalDropCount)
-        {
-            //var d = Instantiate(drop, transform.localPosition, Quaternion.identity);
-            //d.transform.SetParent(gameObject.transform);
-            //_instantiatedDropDropCount++;
-        }
-
-        _frameCount++;
+        DropFactory.DropsAreClosedAction -= DropsAreClosedAction;
     }
-    
 }
