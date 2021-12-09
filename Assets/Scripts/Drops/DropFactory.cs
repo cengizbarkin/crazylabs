@@ -49,7 +49,7 @@ namespace Drops
             closestDrops.Add(selectedDrop);
             for (var i = 0; i < dropList.Count; i++)
             {
-                if (dropList[i].DropColor == selectedDrop.DropColor)
+                if (dropList[i].IsInUse && dropList[i].DropColor == selectedDrop.DropColor)
                 {
                     for (var j = 0; j < closestDrops.Count; j++)
                     {

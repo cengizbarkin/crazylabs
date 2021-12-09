@@ -20,8 +20,7 @@ public class GameManager : MonoBehaviour
         _spawner = new Spawner(spawnerGameObject, _dropFactory);
         Application.targetFrameRate = 60;
     }
-
-
+    
     public void Restart()
     {
         _dropFactory.Restart();
