@@ -1,6 +1,7 @@
 using Colors;
 using Lean.Touch;
 using UnityEngine;
+using Utils;
 
 namespace Drops
 {
@@ -19,7 +20,8 @@ namespace Drops
         private readonly Sprite _sprite;
         private readonly Properties _properties;
         private bool _componentsAreAdded;
-        
+
+        private readonly Camera _mainCamera;
         
         public Drop(Sprite sprite, IDropColor dropColor, DropFactory dropFactory, Properties properties)
         {
@@ -27,7 +29,7 @@ namespace Drops
             DropColor = dropColor;
             _dropFactory = dropFactory;
             _properties = properties;
-            
+            _mainCamera = Camera.main;
             LeanTouch.OnFingerTap += HandleFingerTap;
         }
 
@@ -85,8 +87,8 @@ namespace Drops
         
         private bool AmISelectedTile(LeanFinger finger)
         {
-            if (!Camera.main) return false;
-            var fingerWordPosition = Camera.main.ScreenToWorldPoint(finger.ScreenPosition);
+            if (!_mainCamera) return false;
+            var fingerWordPosition = _mainCamera.ScreenToWorldPoint(finger.ScreenPosition);
             return _circleCollider2D.OverlapPoint(fingerWordPosition);
         }
     }

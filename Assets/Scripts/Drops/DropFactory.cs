@@ -3,13 +3,14 @@ using Colors;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.U2D;
+using Utils;
 
 
 namespace Drops
 {
     public class DropFactory
     {
-        public static UnityAction<int> DropsAreClosedAction;
+        public static UnityAction<IDropColor, int> DropsAreClosedAction;
         
         private readonly SpriteAtlas _dropsSpriteAtlas;
         private static List<Drop> dropList;
@@ -22,8 +23,9 @@ namespace Drops
             closestDrops = new List<Drop>();
             _dropsSpriteAtlas = dropsSpriteAtlas;
             _properties = properties;
+            GameManager.RestartGame += RestartGameAction;
         }
-
+        
         public Drop GetADrop(IDropColor dropColor)
         {
             var drop = dropList.Find(d => d.DropColor ==  dropColor && !d.IsInUse);
@@ -38,7 +40,8 @@ namespace Drops
             
         }
 
-        public void Restart()
+        
+        private void RestartGameAction()
         {
             foreach (var drop in dropList)
             {
@@ -73,10 +76,14 @@ namespace Drops
                 {
                     drop.CloseThisDrop();
                 }
-                DropsAreClosedAction?.Invoke(closestDrops.Count);
+                DropsAreClosedAction?.Invoke(selectedDrop.DropColor, closestDrops.Count);
             }
             closestDrops.Clear();
         }
-        
+
+        public void GameIsKilled()
+        {
+            GameManager.RestartGame -= RestartGameAction;
+        }
     }
 }

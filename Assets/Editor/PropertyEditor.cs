@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using Utils;
 
 namespace Editor
 {
@@ -10,7 +11,12 @@ namespace Editor
         {
             var properties = (Properties)target;
 
-
+            EditorGUILayout.LabelField("Initial Drop Spawn Count");
+            properties.initialDropSpawnCount = 
+                EditorGUILayout.IntSlider(properties.initialDropSpawnCount, 50, 200);
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            
             EditorGUILayout.HelpBox("A drop does not have to touch to selected drop in order to chose. It should be close enough. " +
                                     "This property is used for distance in between same color drops to chose", MessageType.Info);
             EditorGUILayout.LabelField("Max distance to select a drop");
