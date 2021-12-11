@@ -57,7 +57,9 @@ namespace Drops
                     for (var j = 0; j < closestDrops.Count; j++)
                     {
                         var distance = Vector2.Distance(dropList[i].Transform.position, closestDrops[j].Transform.position);
-                        if (distance < _properties.maxDistanceToSelectDrop && !closestDrops.Contains(dropList[i]))
+                        if (distance < _properties.maxDistanceToSelectDrop && 
+                            !closestDrops.Contains(dropList[i]) && 
+                            dropList[i].DropColor == selectedDrop.DropColor)
                         {
                             closestDrops.Add(dropList[i]);
                             i = 0;
