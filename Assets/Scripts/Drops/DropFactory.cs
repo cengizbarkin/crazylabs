@@ -10,15 +10,18 @@ namespace Drops
     public class DropFactory
     {
         public static UnityAction<int> DropsAreClosedAction;
+        
         private readonly SpriteAtlas _dropsSpriteAtlas;
         private static List<Drop> dropList;
         private static List<Drop> closestDrops;
+        private readonly Properties _properties;
         
-        public DropFactory(SpriteAtlas dropsSpriteAtlas)
+        public DropFactory(SpriteAtlas dropsSpriteAtlas, Properties properties)
         {
             dropList = new List<Drop>();
             closestDrops = new List<Drop>();
             _dropsSpriteAtlas = dropsSpriteAtlas;
+            _properties = properties;
         }
 
         public Drop GetADrop(IDropColor dropColor)
@@ -29,7 +32,7 @@ namespace Drops
                 return drop;
             }
             var sprite = _dropsSpriteAtlas.GetSprite(dropColor.GetType().Name); 
-            drop = new Drop(sprite, dropColor);
+            drop = new Drop(sprite, dropColor, this, _properties);
             dropList.Add(drop);
             return drop;    
             
@@ -44,7 +47,7 @@ namespace Drops
         }
         
         
-        public static void DropSelected(Drop selectedDrop)
+        public void DropSelected(Drop selectedDrop)
         {
             closestDrops.Add(selectedDrop);
             for (var i = 0; i < dropList.Count; i++)
@@ -54,7 +57,7 @@ namespace Drops
                     for (var j = 0; j < closestDrops.Count; j++)
                     {
                         var distance = Vector2.Distance(dropList[i].Transform.position, closestDrops[j].Transform.position);
-                        if (distance < 0.6 && !closestDrops.Contains(dropList[i]))
+                        if (distance < _properties.maxDistanceToSelectDrop && !closestDrops.Contains(dropList[i]))
                         {
                             closestDrops.Add(dropList[i]);
                             i = 0;
