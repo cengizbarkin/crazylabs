@@ -26,7 +26,7 @@ namespace Utils
             };
             SpawnDrops(_properties.initialDropSpawnCount);
             DropFactory.DropsAreClosedAction += DropsAreClosedAction;
-            GameManager.RestartGame += RestartGameAction;
+            GameManager.RestartGameAction += RestartGameAction;
         }
 
         private void DropsAreClosedAction(IDropColor color, int closedDropCount)
@@ -47,14 +47,14 @@ namespace Utils
                 var aDrop = _dropFactory.GetADrop(_colorList[i % 4]);
                 var randomPos = new Vector3(position.x, position.y + i / 2.0f);
                 aDrop.OpenThisDrop(randomPos,_spawnerGameObject.transform);
-                aDrop.AddForceToThisDrop();
+                aDrop.AddVelocityToThisDrop();
             }
         }
 
         public void GameIsKilled()
         {
             DropFactory.DropsAreClosedAction -= DropsAreClosedAction;
-            GameManager.RestartGame -= RestartGameAction;
+            GameManager.RestartGameAction -= RestartGameAction;
         }
     }
 }

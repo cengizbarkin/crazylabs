@@ -18,7 +18,7 @@ namespace Ui
         {
             image.sprite = dropSpriteAtlas.GetSprite(gameObject.name);
             DropFactory.DropsAreClosedAction += DropsAreClosedAction;
-            GameManager.RestartGame += RestartGameAction;
+            GameManager.RestartGameAction += RestartGameAction;
         }
 
         private void DropsAreClosedAction(IDropColor color, int count)
@@ -39,7 +39,7 @@ namespace Ui
         private void OnDestroy()
         {
             DropFactory.DropsAreClosedAction -= DropsAreClosedAction;
-            GameManager.RestartGame -= RestartGameAction;
+            GameManager.RestartGameAction -= RestartGameAction;
         }
     }
 }

@@ -11,16 +11,16 @@ namespace Drops
         public Transform Transform { get; private set; }
         public bool IsInUse { get; private set; }
 
+        private bool _componentsAreAdded;
         private GameObject _dropGameObject;
         private SpriteRenderer _spriteRenderer;
         private Rigidbody2D _rigidbody2D;
         private CircleCollider2D _circleCollider2D;
         
+        
         private readonly DropFactory _dropFactory;
         private readonly Sprite _sprite;
         private readonly Properties _properties;
-        private bool _componentsAreAdded;
-
         private readonly Camera _mainCamera;
         
         public Drop(Sprite sprite, IDropColor dropColor, DropFactory dropFactory, Properties properties)
@@ -53,7 +53,7 @@ namespace Drops
             _dropGameObject.SetActive(false);
         }
 
-        public void AddForceToThisDrop()
+        public void AddVelocityToThisDrop()
         {
             var randomYValue = Random.Range(_properties.minVelocityInY, _properties.maxVelocityInY);
             var x = Random.Range(-0.5f, 0.5f);
@@ -79,13 +79,13 @@ namespace Drops
         
         private void HandleFingerTap(LeanFinger finger)
         {
-            if (AmISelectedTile(finger))
+            if (AmISelectedDrop(finger))
             {
                 _dropFactory.DropSelected(this);
             }
         }
         
-        private bool AmISelectedTile(LeanFinger finger)
+        private bool AmISelectedDrop(LeanFinger finger)
         {
             if (!_mainCamera) return false;
             var fingerWordPosition = _mainCamera.ScreenToWorldPoint(finger.ScreenPosition);

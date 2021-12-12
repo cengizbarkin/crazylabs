@@ -7,7 +7,7 @@ using Utils;
 
 public class GameManager : MonoBehaviour
 {
-    public static UnityAction RestartGame;
+    public static UnityAction RestartGameAction;
 
     [SerializeField]
     private GameObject obstacleGameObject;
@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     
     public void Restart()
     {
-        RestartGame?.Invoke();
+        RestartGameAction?.Invoke();
     }
     
     private void OnDestroy()

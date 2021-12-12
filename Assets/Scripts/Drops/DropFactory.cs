@@ -12,9 +12,10 @@ namespace Drops
     {
         public static UnityAction<IDropColor, int> DropsAreClosedAction;
         
-        private readonly SpriteAtlas _dropsSpriteAtlas;
         private static List<Drop> dropList;
         private static List<Drop> closestDrops;
+        
+        private readonly SpriteAtlas _dropsSpriteAtlas;
         private readonly Properties _properties;
         
         public DropFactory(SpriteAtlas dropsSpriteAtlas, Properties properties)
@@ -23,8 +24,9 @@ namespace Drops
             closestDrops = new List<Drop>();
             _dropsSpriteAtlas = dropsSpriteAtlas;
             _properties = properties;
-            GameManager.RestartGame += RestartGameAction;
+            GameManager.RestartGameAction += RestartGameAction;
         }
+        
         
         public Drop GetADrop(IDropColor dropColor)
         {
@@ -39,16 +41,6 @@ namespace Drops
             return drop;    
             
         }
-
-        
-        private void RestartGameAction()
-        {
-            foreach (var drop in dropList)
-            {
-                drop.CloseThisDrop();
-            }
-        }
-        
         
         public void DropSelected(Drop selectedDrop)
         {
@@ -83,7 +75,14 @@ namespace Drops
 
         public void GameIsKilled()
         {
-            GameManager.RestartGame -= RestartGameAction;
+            GameManager.RestartGameAction -= RestartGameAction;
+        }
+        private static void RestartGameAction()
+        {
+            foreach (var drop in dropList)
+            {
+                drop.CloseThisDrop();
+            }
         }
     }
 }
